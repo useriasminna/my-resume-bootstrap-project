@@ -3,7 +3,7 @@ function userInformationHTML(user) {
     <h2>${user.name}
         <span class="small-name">
             (@<a href="${user.html_url}" target="_blank">${user.login}</a>)
-        </span>>
+        </span>
     </h2>
     <div class="gh-content">
         <div class="gh-avatar">
@@ -22,7 +22,7 @@ function repoInformationHTML(repos) {
 
     var listItemsHTML = repos.map(function(repo) {
         return `<li>
-                    <a href="${repo.html_url} target="_blank">${repo.name}</a>
+                    <a href="${repo.html_url}" target="_blank">${repo.name}</a>
                 </li>`;
     });
 
@@ -66,6 +66,9 @@ function fetchGitHubInformation(event) {
         function(errorResponse) {
             if (errorResponse.status === 404) {
                 $("#gh-user-data").html(`<h2>No info found for user ${username}</h2>`)
+            } else if (errorResponse.status === 403) {
+                var resetTime = new Date(errorResponse.getResponseHeader("X-RateLimit-Reset") * 1000);
+                $("#gh-user-data").html(`<h4>Too many requests, please waint until ${resetTime.toLocaleDateString()}</h4>`)
             } else {
                 console.log(errorResponse);
                 $("#gh-user-data").html(`<h2>Error: ${errorResponse.responseJSON.message}</h2>`)
